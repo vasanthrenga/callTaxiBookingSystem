@@ -28,8 +28,8 @@ public class Taxi extends Thread {
 		dropTime.add(pt + Math.abs(pp - dp));
 		amount.add((double) 100 + ((15 * Math.abs(pp - dp)) - 5) * 10);// get distance
 		totalEarn += (double) 100 + ((15 * Math.abs(pp - dp)) - 5) * 10;
-		System.out.println("ampunt to pay : " + (100 + ((15 * Math.abs(pp - dp)) - 5) * 10));
-		this.currentPoint = dp;// upate current point with drop point
+		System.out.println("amount to pay : " + (100 + ((15 * Math.abs(pp - dp)) - 5) * 10));
+		this.currentPoint = dp;// update current point with drop point
 
 	}
 }

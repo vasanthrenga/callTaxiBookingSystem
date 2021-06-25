@@ -1,6 +1,6 @@
 //1) Design a Call taxi booking application
-//        -There are n number of taxi’s. For simplicity, assume 4.
-//        (But it should work for any number of taxi’s)
+//        -There are n number of taxiï¿½s. For simplicity, assume 4.
+//        (But it should work for any number of taxiï¿½s)
 //        -The are 6 points(A,B,C,D,E,F)
 //        -All the points are in a straight line.
 //        -each point is 15kms away from the adjacent points.
@@ -8,10 +8,10 @@
 //        -Each taxi charges Rs.100 minimum for the first 5 kilometers
 //        -Rs.10 for the subsequent kilometers.
 //        -For simplicity, time can be entered as absolute time. Eg: 9hrs, 15hrs etc.
-//        -All taxi’s are initially stationed at A.
+//        -All taxiï¿½s are initially stationed at A.
 //        -When a customer books a Taxi, a free taxi at that point is allocated
 //        -If no free taxi is available at that point, a free taxi at the nearest point is allocated.
-//        -If two taxi’s are free at the same point, one with lower earning is allocated
+//        -If two taxiï¿½s are free at the same point, one with lower earning is allocated
 //        -Note that the taxi only charges the customer from the pickup point to the drop point.
 //        Not the distance it travels from an adjacent point to pickup the customer.
 //        -If no taxi is free at that time, booking is rejected
@@ -72,14 +72,15 @@ package callTaxiBookingSystem;
 
 import java.util.*;
 
-public class Main extends Thread {
+public class Main {
 	static Scanner in = new Scanner(System.in);
 	static int bookid = 1;
+	static int numberOfTaxies = 4;
 	static ArrayList<Taxi> taxies = new ArrayList<Taxi>();
 
 	// constructor
 	Main() {
-		for (int i = 1; i <= 4; i++) {// work with four taxies(i=1 to i=4),you can do n no of taxi
+		for (int i = 1; i <= numberOfTaxies; i++) {
 			Taxi t = new Taxi(i);
 			taxies.add(t);
 		}
@@ -89,9 +90,9 @@ public class Main extends Thread {
 		System.out.print("Enter Customer ID: ");
 		int cid = in.nextInt();
 		System.out.print("Enter Pickup Point: ");
-		char pp = in.next().charAt(0);// from
+		char pp = in.next().toUpperCase().charAt(0);// from
 		System.out.print("Enter Drop Point: ");
-		char dp = in.next().charAt(0);// to
+		char dp = in.next().toUpperCase().charAt(0);// to
 		System.out.print("Enter Pickup Time: ");
 		int pt = in.nextInt();
 		int rej = 1;// for reject a booking
@@ -106,7 +107,7 @@ public class Main extends Thread {
 			return;
 		}
 
-		LinkedList<Taxi> nearestTaxies = new LinkedList<>();
+		ArrayList<Taxi> nearestTaxies = new ArrayList<>();
 		for (Taxi t1 : taxies) {// get nearest taxies in another array list
 			if (t1.isFree == true) {
 				nearestTaxies.add(t1);
@@ -115,58 +116,49 @@ public class Main extends Thread {
 		if (nearestTaxies.size() == 1) {// if we have only one nearest taxi
 			nearestTaxies.get(0).assign(bookid, cid, pp, dp, pt);
 			bookid++;
+			System.out.println("Taxi id " + nearestTaxies.get(0).id + " is Assigned ");
 			TaxiHold th = new TaxiHold(nearestTaxies.get(0));
 			th.start();
-            try {Thread.sleep(1000);}
-            catch(Exception e) {System.out.println(e);}
-			return;
 		} else {
-			int min = Math.abs(nearestTaxies.getFirst().currentPoint - pp);
+			int minDis = Math.abs(nearestTaxies.get(0).currentPoint - pp);
 			int countMinDis = 0;
 			for (int i = 1; i < nearestTaxies.size(); i++) {// getting minimum distance
-				if (min > Math.abs(nearestTaxies.get(i).currentPoint - pp)) {
-					min = Math.abs(nearestTaxies.get(i).currentPoint - pp);
+				if (minDis > Math.abs(nearestTaxies.get(i).currentPoint - pp)) {
+					minDis = Math.abs(nearestTaxies.get(i).currentPoint - pp);
 				}
 			}
 			for (int i = 0; i < nearestTaxies.size(); i++) {
-				if (min == Math.abs(nearestTaxies.get(i).currentPoint - pp))
+				if (minDis == Math.abs(nearestTaxies.get(i).currentPoint - pp))
 					countMinDis++;
 				else {
 					nearestTaxies.remove(i);
 				}
 			}
 			if (countMinDis == 1) {
-				nearestTaxies.getFirst().assign(bookid, cid, pp, dp, pt);
+				nearestTaxies.get(0).assign(bookid, cid, pp, dp, pt);
 				bookid++;
-				TaxiHold th = new TaxiHold(nearestTaxies.getFirst());
+				System.out.println("Taxi id " + nearestTaxies.get(0).id + " is Assigned ");
+				TaxiHold th = new TaxiHold(nearestTaxies.get(0));
 				th.start();
-                try {Thread.sleep(1000);}
-                catch(Exception e) {System.out.println(e);}
-				return;
 			} else {
-				double minE = nearestTaxies.getFirst().totalEarn;
+				double minEar = nearestTaxies.get(0).totalEarn;
 				int countMinEar = 0;
 				for (int i = 1; i < nearestTaxies.size(); i++) {// get minimum earning taxi from minimum distance taxies
-					if (minE > nearestTaxies.get(i).totalEarn) {
-						minE = nearestTaxies.get(i).totalEarn;
+					if (minEar > nearestTaxies.get(i).totalEarn) {
+						minEar = nearestTaxies.get(i).totalEarn;
 					}
 				}
 				for (int i = 0; i < nearestTaxies.size(); i++) {
-					if (minE == nearestTaxies.get(i).totalEarn)
+					if (minEar == nearestTaxies.get(i).totalEarn)
 						countMinEar++;
 					else
 						nearestTaxies.remove(i);
 				}
-				nearestTaxies.getFirst().assign(bookid, cid, pp, dp, pt);
+				nearestTaxies.get(0).assign(bookid, cid, pp, dp, pt);
 				bookid++;
-				TaxiHold th = new TaxiHold(nearestTaxies.getFirst());
+				System.out.println("Taxi id " + nearestTaxies.get(0).id + " is Assigned ");
+				TaxiHold th = new TaxiHold(nearestTaxies.get(0));
 				th.start();
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                    System.out.println(e);
-                }
-				return;
 			}
 
 		}
@@ -175,10 +167,12 @@ public class Main extends Thread {
 	static void taxiDetails() {
 		for (Taxi t : taxies) {
 			if (t.totalEarn != 0.0) {
-				System.out.println("---------------------------------------------------------------------------------------");
+				System.out.println(
+						"---------------------------------------------------------------------------------------");
 				System.out.print("Taxi id - " + t.id);
 				System.out.print("\t\t Total Earnings - " + t.totalEarn);
-				System.out.println("\n---------------------------------------------------------------------------------------");
+				System.out.println(
+						"\n---------------------------------------------------------------------------------------");
 				System.out.println("BookingID\tCustomerID\tFrom\tTo\tPickupTime\tDropTime\tAmount");
 				for (int i = 0; i < t.bookingId.size(); i++) {
 					System.out.print(t.bookingId.get(i));
@@ -189,7 +183,8 @@ public class Main extends Thread {
 					System.out.print("\t\t" + t.dropTime.get(i));
 					System.out.print("\t\t" + t.amount.get(i));
 				}
-				System.out.println("\n---------------------------------------------------------------------------------------\n");
+				System.out.println(
+						"\n---------------------------------------------------------------------------------------\n");
 			}
 		}
 	}
@@ -206,7 +201,7 @@ public class Main extends Thread {
 	public static void main(String args[]) {
 		Main tb = new Main();
 		while (true) {
-			System.out.println("\n______Taxi Booking______");
+			System.out.println("______Taxi Booking______");
 			System.out.println("1.Book Taxi  ");
 			System.out.println("2.Taxi Details  ");
 			System.out.println("3.Taxies Status ");
@@ -214,25 +209,28 @@ public class Main extends Thread {
 			System.out.print("Enter your choice : ");
 			int ch = in.nextInt();
 			switch (ch) {
-			case 1: {
-				bookTaxi();
-				break;
-			}
-			case 2: {
-				taxiDetails();
-				break;
-			}
-			case 3: {
-				taxiStatus();
-				break;
-			}
-			case 4:
-				System.exit(0);
-
-			default: {
-				System.out.println("Enter valid choice :");
-				break;
-			}
+				case 1: {
+					bookTaxi();
+					System.out.println();
+					break;
+				}
+				case 2: {
+					taxiDetails();
+					System.out.println();
+					break;
+				}
+				case 3: {
+					taxiStatus();
+					System.out.println();
+					break;
+				}
+				case 4:
+					System.exit(0);
+	
+				default: {
+					System.out.println("Enter valid choice :(\n");
+					break;
+				}
 			}
 		}
 	}
